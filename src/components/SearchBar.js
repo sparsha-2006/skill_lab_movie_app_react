@@ -1,13 +1,12 @@
 import { useState } from "react";
 
 export default function SearchBar({ onSearch }) {
-  const [text, setText] = useState("");
+  const [query, setQuery] = useState("");
 
   const handleSubmit = (e) => {
-    e.preventDefault();
-    if (text.trim() !== "") {
-      onSearch(text.trim());
-    }
+    e.preventDefault();           
+    if (query.trim() === "") return;
+    onSearch(query);             
   };
 
   return (
@@ -15,8 +14,8 @@ export default function SearchBar({ onSearch }) {
       <input
         type="text"
         placeholder="Search movies..."
-        value={text}
-        onChange={(e) => setText(e.target.value)}
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
       />
       <button type="submit">Search</button>
     </form>

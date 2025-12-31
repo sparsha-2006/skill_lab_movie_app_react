@@ -23,13 +23,6 @@ function App() {
     <div className={dark ? "dark" : ""}>
       <Navbar />
 
-      {/* Dark Mode Toggle */}
-      <div style={{ textAlign: "center", margin: "10px" }}>
-        <button onClick={() => setDark(!dark)}>
-          {dark ? "☀ Light Mode" : "🌙 Dark Mode"}
-        </button>
-      </div>
-
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/movie/:id" element={<MovieDetails />} />

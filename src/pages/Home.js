@@ -1,86 +1,113 @@
-// src/pages/Home.js
-// Home page: Search movies + Pagination + Responsive grid
-
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import SearchBar from "../components/SearchBar";
 import MovieCard from "../components/MovieCard";
 
 const API_KEY = process.env.REACT_APP_OMDB_API_KEY;
 
+const RECOMMENDED_TERMS = [
+  "Avengers",
+  "Harry Potter",
+  "Batman",
+  "Star Wars",
+  "Jurassic"
+];
+
 export default function Home() {
+  const [recommended, setRecommended] = useState([]);
   const [movies, setMovies] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState(1);
 
-  // Fetch movies from OMDb API with pagination
-  const fetchMovies = async (search, pageNo = 1) => {
+  // FETCH RECOMMENDATIONS
+  
+  const fetchRecommendations = async () => {
     try {
-      const response = await axios.get(
-        `https://www.omdbapi.com/?apikey=${API_KEY}&s=${search}&page=${pageNo}`
+      const term =
+        RECOMMENDED_TERMS[
+          Math.floor(Math.random() * RECOMMENDED_TERMS.length)
+        ];
+
+      const res = await axios.get(
+        `https://www.omdbapi.com/?apikey=${API_KEY}&s=${term}`
       );
-      setMovies(response.data.Search || []);
+
+      setRecommended(res.data.Search || []);
     } catch (error) {
-      console.error("Error fetching movies:", error);
+      console.error("Error fetching recommendations:", error);
     }
   };
 
-  // When user searches a movie
-  const handleSearch = (term) => {
-    setSearchTerm(term);
-    setPage(1);
-    fetchMovies(term, 1);
-  };
+  useEffect(() => {
+    fetchRecommendations();
+  }, []);
 
-  // Go to next page
-  const nextPage = () => {
-    const next = page + 1;
-    setPage(next);
-    fetchMovies(searchTerm, next);
-  };
+ 
+  // SEARCH MOVIES
+  
+  const handleSearch = async (term) => {
+    try {
+      setSearchTerm(term);
+      setPage(1);
 
-  // Go to previous page
-  const prevPage = () => {
-    if (page > 1) {
-      const prev = page - 1;
-      setPage(prev);
-      fetchMovies(searchTerm, prev);
+      const res = await axios.get(
+        `https://www.omdbapi.com/?apikey=${API_KEY}&s=${term}&page=1`
+      );
+
+      setMovies(res.data.Search || []);
+    } catch (error) {
+      console.error("Error searching movies:", error);
     }
   };
 
   return (
-    <div>
-      {/* Home Page Heading */}
-      <h1 style={{ textAlign: "center" }}>Search Movies 🎬</h1>
-      <p style={{ textAlign: "center", color: "gray" }}>
-        Find movies and manage your favorites
-      </p>
+    <div className="page-container">
+      <h1 className="page-title"> Movie App</h1>
+      <p className="page-subtitle">Search and explore movies</p>
 
-      {/* Search Bar */}
+      {/* SEARCH BAR */}
       <SearchBar onSearch={handleSearch} />
 
-      {/* Movie Cards Grid */}
+      {/* 
+          RECOMMENDATIONS */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginTop: "30px"
+        }}
+      >
+        <h2> Recommended Movies</h2>
+        <button onClick={fetchRecommendations}>
+          🔄 Refresh Recommendations
+        </button>
+      </div>
+
       <div className="movie-grid">
-        {movies.map((movie) => (
-          <MovieCard key={movie.imdbID} movie={movie} />
+        {recommended.map((movie) => (
+          <MovieCard
+            key={`rec-${movie.imdbID}`}   //  UNIQUE KEY
+            movie={movie}
+          />
         ))}
       </div>
 
-      {/* Pagination Controls */}
+      {/* 
+          SEARCH RESULTS */}
       {movies.length > 0 && (
-        <div style={{ textAlign: "center", margin: "30px" }}>
-          <button onClick={prevPage} disabled={page === 1}>
-            ⬅ Previous
-          </button>
+        <>
+          <h2 style={{ marginTop: "40px" }}>🔍 Search Results</h2>
 
-          <span style={{ margin: "0 15px", fontWeight: "bold" }}>
-            Page {page}
-          </span>
-
-          <button onClick={nextPage}>
-            Next ➡
-          </button>
-        </div>
+          <div className="movie-grid">
+            {movies.map((movie) => (
+              <MovieCard
+                key={`search-${movie.imdbID}`} //  UNIQUE KEY
+                movie={movie}
+              />
+            ))}
+          </div>
+        </>
       )}
     </div>
   );
