@@ -1,7 +1,7 @@
 🎬 Movie App – React.js
 
 🔗 Live Demo
-👉 https://deluxe-marshmallow-36ba18.netlify.app/
+👉 https://famous-llama-559e09.netlify.app/
 
 📂 GitHub Repository
 👉https://github.com/sparsha-2006/skill_lab_movie_app_react
